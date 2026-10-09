@@ -1,7 +1,7 @@
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
-// ---------- config ----------
+
 const FRICTION = 0.985;
 const STOP_SPEED = 0.05;
 const WALL_BOUNCE = 0.85;
@@ -9,14 +9,14 @@ const MAX_SPEED = 18;
 const SUBSTEPS = 4;
 const HOLE_R = 16;
 
-// surface types: each one changes how fast the ball slows down
+
 const ZONE_TYPES = {
   sand: { friction: 0.94, color: "#e3c77a" },
   ice: { friction: 0.992, color: "#a9dcf0" },
   mud: { friction: 0.9, color: "#6b4a2f" },
 };
 
-// ---------- Vec2 helper ----------
+
 const Vec2 = {
   add: (a, b) => ({ x: a.x + b.x, y: a.y + b.y }),
   sub: (a, b) => ({ x: a.x - b.x, y: a.y - b.y }),
@@ -34,7 +34,7 @@ function inRect(p, r) {
   return p.x > r.x && p.x < r.x + r.w && p.y > r.y && p.y < r.y + r.h;
 }
 
-// ---------- levels (data, not code) ----------
+
 function rect(x, y, w, h) {
   return [
     { x1: x, y1: y, x2: x + w, y2: y },
@@ -80,7 +80,7 @@ const levels = [
     tee: { x: 100, y: 250 },
     hole: { x: 700, y: 250 },
     walls: [],
-    water: [{ x: 350, y: 0, w: 100, h: 340 }], // gap along the bottom
+    water: [{ x: 350, y: 0, w: 100, h: 340 }], 
   },
   {
     name: "Hole 6: Slip and Slide",
@@ -95,8 +95,8 @@ const levels = [
   },
 ];
 
-// ---------- game state ----------
-let state = "menu"; // menu | playing | holeDone | finished
+
+let state = "menu"; 
 let levelIndex = 0;
 let level = levels[0];
 let walls = [];
@@ -152,7 +152,7 @@ function scoreLabel(s, par) {
   return "+" + diff;
 }
 
-// ---------- input ----------
+
 function getPos(e) {
   const box = canvas.getBoundingClientRect();
   return {
@@ -196,13 +196,13 @@ window.addEventListener("pointerup", () => {
   if (!dragging) return;
   dragging = false;
   const shot = getShot();
-  lastPos = { x: ball.x, y: ball.y }; // where to reset to if we hit water
+  lastPos = { x: ball.x, y: ball.y }; 
   ball.vx = shot.vx;
   ball.vy = shot.vy;
   strokes++;
 });
 
-// ---------- physics ----------
+
 function collideSegment(seg) {
   const a = { x: seg.x1, y: seg.y1 };
   const b = { x: seg.x2, y: seg.y2 };
@@ -241,7 +241,7 @@ function update() {
     for (const w of walls) collideSegment(w);
   }
 
-  // friction depends on the surface under the ball
+
   let fric = FRICTION;
   for (const z of zones) {
     if (inRect(ball, z)) fric = ZONE_TYPES[z.type].friction;
@@ -253,7 +253,7 @@ function update() {
     ball.vy = 0;
   }
 
-  // water: back to where you last shot from, plus a penalty stroke
+
   for (const w of water) {
     if (inRect(ball, w)) {
       ball.x = lastPos.x;
@@ -266,7 +266,6 @@ function update() {
     }
   }
 
-  // hole: gentle magnet, then sink
   const dx = level.hole.x - ball.x;
   const dy = level.hole.y - ball.y;
   const dist = Math.hypot(dx, dy);
@@ -288,7 +287,7 @@ function update() {
   }
 }
 
-// ---------- drawing ----------
+
 function drawOverlay() {
   ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -343,19 +342,19 @@ function draw() {
     return;
   }
 
-  // surface zones
+
   for (const z of zones) {
     ctx.fillStyle = ZONE_TYPES[z.type].color;
     ctx.fillRect(z.x, z.y, z.w, z.h);
   }
 
-  // water
+
   for (const w of water) {
     ctx.fillStyle = "#2f7fd1";
     ctx.fillRect(w.x, w.y, w.w, w.h);
   }
 
-  // walls
+
   ctx.strokeStyle = "#5b3a1e";
   ctx.lineWidth = 6;
   ctx.lineCap = "round";
@@ -372,7 +371,6 @@ function draw() {
   ctx.arc(level.hole.x, level.hole.y, HOLE_R, 0, Math.PI * 2);
   ctx.fill();
 
-  // aim line
   if (dragging) {
     const shot = getShot();
     ctx.strokeStyle = "white";
@@ -383,20 +381,20 @@ function draw() {
     ctx.stroke();
   }
 
-  // ball
+
   ctx.fillStyle = "white";
   ctx.beginPath();
   ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
   ctx.fill();
 
-  // HUD
+
   ctx.fillStyle = "white";
   ctx.textAlign = "left";
   ctx.font = "20px sans-serif";
   ctx.fillText(level.name, 20, 30);
   ctx.fillText("Par: " + level.par + "   Strokes: " + strokes, 20, 58);
 
-  // splash message
+
   if (splashTimer > 0) {
     ctx.textAlign = "center";
     ctx.font = "32px sans-serif";
@@ -404,7 +402,7 @@ function draw() {
     ctx.textAlign = "left";
   }
 
-  // hole complete popup
+
   if (state === "holeDone") {
     drawOverlay();
     ctx.font = "48px sans-serif";
@@ -423,4 +421,5 @@ function loop() {
   draw();
   requestAnimationFrame(loop);
 }
+
 loop();
